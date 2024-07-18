@@ -25,10 +25,14 @@ const authReducer = createSlice({
         updateSuccess : (state,action)=>{
             state.login.currentCustomer = action.payload
         },
-        
+        updateCustomerToken : (state,action)=>{
+            state.login.currentCustomer.accessToken = action.payload.newAccessToken;
+            state.login.currentCustomer.refreshToken = action.payload.newRefreshToken;
+
+        }
     }
 })
 
-export const {loginSuccess, loginFail, loggedOut,updateSuccess} = authReducer.actions;
+export const {loginSuccess, loginFail, loggedOut,updateSuccess, updateCustomerToken} = authReducer.actions;
 export default authReducer.reducer;
 

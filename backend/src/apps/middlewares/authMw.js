@@ -28,6 +28,12 @@ exports.verifyAuthenticationCustomer = (req, res, next) => {
             config.get("app.jwtAccessKey"),
             (error, customer) => {
                 if (error) {
+                    if(error.name === "TokenExpiredError") {
+                        return res.status(200).json({
+                            code : 401,
+                            message : "Token Expired"
+                        })
+                    }
                     return res.status(401).json("Authentication fails")
                 }
                 next();

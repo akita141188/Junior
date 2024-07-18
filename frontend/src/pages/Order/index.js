@@ -1,5 +1,5 @@
 
-import { getOrdersCutomer } from "../../services/Api";
+import { getOrdersCutomer, canceledOrder } from "../../services/Api";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -8,11 +8,26 @@ import { Link } from "react-router-dom";
 const Order = () => {
     const [orders, setOrders] = useState([]);
     const { id } = useParams();
+    const [sttOrder, setSttOrder] = useState("")
     useEffect(() => {
         getOrdersCutomer(id)
             .then(({ data }) => setOrders(data.data.docs))
             .catch((error) => console.log(error))
     }, [])
+    const clickCancel = (e,orderId)=>{
+        e.preventDefault();
+          // eslint-disable-next-line no-restricted-globals
+        const isConfirm = confirm("Ban co muon huy don hang nay ko ?");
+        if(isConfirm){
+            return canceledOrder(orderId).then(({data})=> {
+                setSttOrder(orderId)
+                setOrders(orders.map(order =>
+                    order._id === orderId ? { ...order, status: 0 } : order
+                  ));
+            } ).catch((error)=>console.log(error))
+        }
+    
+    }
     return (
         <>
             <div id="my-cart">
@@ -25,7 +40,7 @@ const Order = () => {
                         orders.map((order, index) => {
 
                             return (
-                                <div key={index} className="cart-item row">
+                                <div key={index} className={`cart-item row ${order.status === 1 ? "alert-success" : ""} ${order.status === 0 ? "alert-danger" : ""}`}>
                                     <div className="cart-thumb col-lg-7 col-md-7 col-sm-12">
                                         <h4>Đơn hàng đã mua vào ngày: <span className="text-secondary">{order.createdAt}</span></h4>
                                         <p>Mã Đơn (MĐ): {order._id}</p>
@@ -52,7 +67,7 @@ const Order = () => {
                                                 (
                                                     <>
                                                         <button type="button" className="btn btn-outline-success mb-1">Đơn đang giao</button>
-                                                        <button type="button" className="btn btn-danger mb-1">Hủy đơn</button>
+                                                        <a onClick={(e)=> clickCancel(e,order._id)} href="#" type="button" className="btn btn-danger mb-1">Hủy đơn</a>
                                                     </>
                                                 ) : null
                                         }

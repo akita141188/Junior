@@ -16,3 +16,8 @@ export const UpdateCustomer = (data)=> Http.post("/customer/update",data)
 export const getOrdersCutomer = (id,config)=> Http.get(`/customer/${id}/orders`, config)
 // chi tiet don hang
 export const getOrderCutomer = (id,config)=> Http.get(`/customer/order/${id}`, config)
+//cancel don hang
+export const canceledOrder = (id,config)=> Http.get(`/customer/order/${id}/canceled`, config)
+
+//call rereshToken
+export const refreshToken = (config)=> Http.get(`/customer/refreshtoken`,config)

@@ -25,5 +25,7 @@ router.post("/customer/update",authMw.verifyAuthenticationCustomer,CustomerContr
 
 router.get("/customer/:id/orders",authMw.verifyAuthenticationCustomer,OrderController.ordersCustomer);
 router.get("/customer/order/:id",authMw.verifyAuthenticationCustomer, OrderController.orderDetail);
+router.get("/customer/order/:id/canceled",authMw.verifyAuthenticationCustomer, OrderController.canceledOrder);
+router.get("/customer/refreshtoken", AuthController.refreshToken);
 
 module.exports = router;

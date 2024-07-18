@@ -96,3 +96,17 @@ exports.orderDetail = async (req,res)=>{
         return res.status(500).json(error)
     }
 }
+
+exports.canceledOrder = async(req,res)=>{
+
+    try {
+        const {id}= req.params;
+        await OrderModel.updateOne({_id : id},{$set : {status : 0}})
+        return res
+        .status(200)
+        .json({ message: "Canceled order successfully" })
+    } catch (error) {
+        return res.status(500).json(error)
+        
+    }
+}

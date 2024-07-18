@@ -6,7 +6,8 @@ const cookieParser = require("cookie-parser")
 
 
 const corsOption = {
-    origin: "*" // 1 đối tượng thì đặt trong " ", nhiều [ ], "*" tất cả đều thông qua.
+    origin: "http://localhost:3000" ,// 1 đối tượng thì đặt trong " ", nhiều [ ], "*" tất cả đều thông qua.
+    credentials: true
 }
 
 app.use(cors(corsOption))

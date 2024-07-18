@@ -1,6 +1,20 @@
 const jwt = require("jsonwebtoken")
 const config = require("config")
 const CustomerModel = require("../../models/customerModel")
+const generateAccessToken = (customer)=>{
+    return jwt.sign(
+        {email: customer.email, password : customer.password},
+        config.get("app.jwtAccessKey"),
+        {expiresIn : "10s"}
+    )
+}
+const generateRefreshToken = (customer)=>{
+    return jwt.sign(
+        {email: customer.email, password : customer.password},
+        config.get("app.jwtRefreshKey"),
+        {expiresIn : "1d"}
+    )
+}
 exports.loginCustomer = async (req,res)=>{
     try {
         const {body} = req;
@@ -13,16 +27,15 @@ exports.loginCustomer = async (req,res)=>{
             return res.status(401).json("password not valid")
         }
         if(customer && validPassword){
-            const accessToken = jwt.sign(
-                {email: body.email, password : body.password},
-                config.get("app.jwtAccessKey"),
-                {expiresIn : "1d"}
-            )
-            res.cookie("tokenCustomer",accessToken)
+            const accessToken = generateAccessToken(customer)
+            const refreshToken = generateRefreshToken(customer)
+            
+            res.cookie("refreshToken",refreshToken)
             const {password,...others} = customer._doc;
             return res.status(200).json({
                 ...others,
-                accessToken
+                accessToken,
+                refreshToken,
             });
         }
     } catch (error) {
@@ -58,5 +71,24 @@ exports.register = async(req,res)=>{
     }
 }
 
+exports.refreshToken = async(req,res)=>{
+    try {
+        const {refreshToken} = req.cookies;
+        jwt.verify(
+            refreshToken,
+            config.get("app.jwtRefreshKey"),
+            (error,customer)=>{
+                if(error) return res.status(401).json("Authentication failed");
+                const newAccessToken = generateAccessToken(customer);
+                const newRefreshToken = generateRefreshToken(customer);
+                return res.status(200).json({
+                    accessToken : newAccessToken,
+                    refreshToken : newRefreshToken
+                })
+            }
+        );
 
-
+    } catch (error) {
+        res.status(500).json(error)
+    }
+}
